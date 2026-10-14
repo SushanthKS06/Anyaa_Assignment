@@ -2,12 +2,6 @@
 
 > **A dual-persona, neuro-symbolic voice agent built for real Indian household kitchens:** collaborative meal planning with multi-generational families, real-time grocery orchestration, and interactive, hands-free cooking execution with the domestic cook.
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Tests Passing](https://img.shields.io/badge/evals-64%2F64%20passed-brightgreen.svg)]()
-[![Scenarios Passing](https://img.shields.io/badge/scenarios-14%2F14%20zero%20failures-brightgreen.svg)]()
-[![Languages](https://img.shields.io/badge/languages-English%20%7C%20தமிழ்%20%7C%20हिन्दी-orange.svg)]()
-[![Architecture](https://img.shields.io/badge/core-deterministic%20python-emerald.svg)]()
-[![Status](https://img.shields.io/badge/offline%20ready-zero%20keys%20required-purple.svg)]()
 
 ---
 
