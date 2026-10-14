@@ -21,7 +21,7 @@ Most AI meal planners fail in real Indian households because they treat kitchen 
 
 ## 2. System Architecture
 
-```
+```mermaid
 graph TD
     User([User Voice / Text]) --> VoiceLayer["Voice Gateway: Web Speech / Sarvam AI / VAD Barge-in"]
     VoiceLayer --> Router["Intent & Language Router: Auto-detect en-IN / ta-IN / hi-IN"]
