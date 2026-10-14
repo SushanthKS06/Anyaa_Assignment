@@ -21,33 +21,35 @@ Most AI meal planners fail in real Indian households because they treat kitchen 
 
 ## 2. System Architecture
 
-```mermaid
 graph TD
-    User([User Voice / Text]) --> VoiceLayer[Voice Gateway: WebSpeech / Sarvam AI / VAD Barge-in]
-    VoiceLayer --> Router[Intent & Language Router<br/>Auto-Detects: en-IN / ta-IN / hi-IN]
-    
-    subgraph Shared Brain [Orchestrator State Machine & SQLite WAL]
-        Router --> ModeCheck{Active Mode?}
-        ModeCheck -->|Household| HouseholdPersona[Household Persona: Warm & Collaborative]
-        ModeCheck -->|Cook| CookPersona[Cook Persona: Direct & Operational]
-        
-        HouseholdPersona <--> StateStore[(Household Constraints & Plan State)]
+    User([User Voice / Text]) --> VoiceLayer["Voice Gateway: Web Speech / Sarvam AI / VAD Barge-in"]
+    VoiceLayer --> Router["Intent & Language Router: Auto-detect en-IN / ta-IN / hi-IN"]
+
+    subgraph SharedBrain["Shared Brain: Orchestrator State Machine & SQLite WAL"]
+        Router --> ModeCheck{"Active Mode?"}
+        ModeCheck -->|Household| HouseholdPersona["Household Persona: Warm & Collaborative"]
+        ModeCheck -->|Cook| CookPersona["Cook Persona: Direct & Operational"]
+
+        HouseholdPersona <--> StateStore[("Household Constraints & Plan State")]
         CookPersona <--> StateStore
     end
-    
-    subgraph Deterministic Engine [Zero-Hallucination Python Core]
-        StateStore --> Planner[Constraint Solver & Meal Planner]
-        Planner --> Adaptations[Adaptation Splitter: Toddler / Jain / Non-Veg / Allergies]
-        Adaptations --> GroceryEngine[Grocery Normalizer & Pantry Deductor]
-        GroceryEngine --> InstamartMock[Simulated Instamart Cart & Stock-Out Recovery]
-        GroceryEngine --> WhatsAppMock[Simulated WhatsApp Cook Handoff]
-        CookPersona --> KitchenEngine[Disruptions: Guests, Rush 20m Meals, Swaps]
+
+    subgraph DeterministicEngine["Deterministic Engine: Python Core"]
+        StateStore --> Planner["Constraint Solver & Meal Planner"]
+        Planner --> Adaptations["Adaptation Splitter: Toddler / Jain / Non-Veg / Allergies"]
+        Adaptations --> GroceryEngine["Grocery Normalizer & Pantry Deductor"]
+        GroceryEngine --> InstamartMock["Simulated Instamart Cart & Stock-Out Recovery"]
+        GroceryEngine --> WhatsAppMock["Simulated WhatsApp Cook Handoff"]
+        CookPersona --> KitchenEngine["Kitchen Disruptions: Guests / 20-Minute Meals / Swaps"]
     end
-    
-    subgraph Interactive UI Cockpit [FastAPI + WebSocket + Tailwind]
-        Shared Brain --> WebCockpit[Live Cockpit: Realtime Plan, Cart, Cook Companion Cards]
+
+    subgraph InteractiveUI["Interactive UI Cockpit: FastAPI + WebSocket"]
+        StateStore --> WebCockpit["Live Cockpit: Real-Time Plan, Cart & Cook Companion Cards"]
+        Planner --> WebCockpit
+        GroceryEngine --> WebCockpit
+        KitchenEngine --> WebCockpit
     end
-```
+
 
 ---
 
