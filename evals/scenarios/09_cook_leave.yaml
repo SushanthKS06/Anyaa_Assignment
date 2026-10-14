@@ -1,0 +1,14 @@
+name: cook_on_leave
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Dadi, age_group: senior, diet: jain}
+    - {name: Papa, age_group: adult, diet: veg}
+  budget_inr: 4000
+  nonveg_days: []
+  cook: {language: Hinglish, skill: basic, equipment: [], leave_days: [Thu]}
+disruptions:
+  - {tool: report_disruption, args: {kind: cook_leave, detail: 'tabiyat kharab', day: Friday, slot: ''}}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported]

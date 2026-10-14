@@ -1,0 +1,16 @@
+name: navratri_week
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Kaka, age_group: adult, diet: veg, fasting_days: [Mon, Thu]}
+    - {name: Kaki, age_group: adult, diet: veg, fasting_days: [Mon, Thu]}
+    - {name: Diku, age_group: teen, diet: veg}
+    - {name: Ba, age_group: senior, diet: jain, fasting_days: [Mon]}
+  budget_inr: 8000
+  nonveg_days: []
+  guests: {count: 4, days: [Fri]}
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker, mixer], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, fasting_plates]
+params: {fasting_plates: {members: [Kaka, Kaki, Ba], weekdays: [Mon]}}

@@ -1,0 +1,13 @@
+name: near_empty_pantry
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Baba, age_group: adult, diet: nonveg}
+    - {name: Ma, age_group: adult, diet: veg}
+  budget_inr: 4000
+  pantry: {}
+  nonveg_days: [Sun]
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported]

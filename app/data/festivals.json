@@ -1,0 +1,44 @@
+﻿{
+  "navratri": {
+    "fasting_days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "allowed_foods": ["sabudana", "kuttu", "singhara", "sendha_salt", "milk", "curd", "fruits"],
+    "banned_foods": ["wheat", "rice", "onion", "garlic", "meat", "egg"],
+    "notes": "Nine-day fasting festival. Vrat-tagged dishes only."
+  },
+  "ekadashi": {
+    "fasting_days": ["ekadashi"],
+    "allowed_foods": ["sabudana", "fruits", "milk", "curd", "sendha_salt"],
+    "banned_foods": ["rice", "wheat", "lentils", "onion", "garlic"],
+    "notes": "Bi-monthly fast. Sabudana khichdi is the classic meal."
+  },
+  "diwali": {
+    "fasting_days": [],
+    "allowed_foods": ["all"],
+    "banned_foods": [],
+    "notes": "Celebration week — sweets, snacks, and festive dishes typical."
+  },
+  "holi": {
+    "fasting_days": [],
+    "allowed_foods": ["all"],
+    "banned_foods": [],
+    "notes": "Celebration day. Gujiya, thandai, and festive snacks."
+  },
+  "karva_chauth": {
+    "fasting_days": ["karva_chauth"],
+    "allowed_foods": ["fruits", "milk", "water"],
+    "banned_foods": ["all_solids_until_moonrise"],
+    "notes": "Single-day married-women fast until moonrise."
+  },
+  "janmashtami": {
+    "fasting_days": ["janmashtami"],
+    "allowed_foods": ["sabudana", "fruits", "milk", "curd", "makhana", "sendha_salt"],
+    "banned_foods": ["grains", "onion", "garlic"],
+    "notes": "Krishna birthday fast. Makhana and sabudana dishes."
+  },
+  "shivratri": {
+    "fasting_days": ["shivratri"],
+    "allowed_foods": ["sabudana", "kuttu", "singhara", "milk", "curd", "fruits", "sendha_salt"],
+    "banned_foods": ["wheat", "rice", "onion", "garlic", "meat"],
+    "notes": "Single-day Shiva fast similar to Navratri restrictions."
+  }
+}

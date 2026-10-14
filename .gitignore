@@ -1,0 +1,45 @@
+# Environments & Secrets
+.env
+.env.local
+.env.*.local
+myenv/
+venv/
+.venv/
+env/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing & Type checking
+.pytest_cache/
+.benchmarks/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime Database & Logs
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+logs/*.log
+logs/*.jsonl
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

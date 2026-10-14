@@ -1,0 +1,13 @@
+name: toddler_soft_food
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Mummy, age_group: adult, diet: veg}
+    - {name: Chhotu, age_group: toddler, diet: veg, health_notes: [soft_food]}
+  budget_inr: 4000
+  nonveg_days: []
+  cook: {language: Hinglish, skill: basic, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, soft_cover]
+params: {soft_cover: {need: soft_food, tag: kid_ok, min_frac: 0.3}}

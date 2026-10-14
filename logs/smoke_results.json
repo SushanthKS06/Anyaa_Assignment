@@ -1,0 +1,189 @@
+{
+  "utterances": [
+    {
+      "in": "Dadi Jain hain, onion garlic bilkul nahi chahiye",
+      "members": [
+        {
+          "name": "Dadi",
+          "age_group": "senior",
+          "diet": "jain",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Papa diabetic hain, low sugar khana banao",
+      "members": [
+        {
+          "name": "Papa",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [
+            "low_sugar"
+          ],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Chhotu 2 saal ka hai, toddler ke liye soft food, mirchi kam",
+      "members": [
+        {
+          "name": "Chhotu",
+          "age_group": "toddler",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [
+            "soft_food"
+          ],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Mujhe peanut se allergy hai, please peanut avoid karo",
+      "members": [
+        {
+          "name": "AllergyMember",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [
+            "peanut"
+          ],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Teen beta non-veg sirf Saturday Sunday khata hai",
+      "members": [
+        {
+          "name": "Beta",
+          "age_group": "teen",
+          "diet": "nonveg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Dadi ka Ekadashi fast hai Thursday ko, vrat ka khana chahiye",
+      "members": [
+        {
+          "name": "Member1",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Budget 5000 rupaye hai is hafte ka, sasta plan banao",
+      "members": [
+        {
+          "name": "Member1",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Cook Thursday ko chhutti par hai, simple khana rakho",
+      "members": [
+        {
+          "name": "Member1",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Friday ko 4 guests aa rahe hain dinner par",
+      "members": [
+        {
+          "name": "Member1",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    },
+    {
+      "in": "Haan nahi wait, paneer nahi — aloo gobhi bana do Tuesday ko",
+      "members": [
+        {
+          "name": "Member1",
+          "age_group": "adult",
+          "diet": "veg",
+          "allergies": [],
+          "health_notes": [],
+          "dislikes": [],
+          "fasting_days": []
+        }
+      ],
+      "llm_model": "mock:deterministic",
+      "concise": true
+    }
+  ],
+  "tool_trials": {
+    "passed": 20,
+    "total": 20,
+    "llm_calls": 20
+  },
+  "latency_ms": {
+    "p50": 0.42,
+    "p95": 0.6,
+    "max": 0.65
+  },
+  "fallback": {
+    "forced_429_model": "mock:deterministic",
+    "fallback_label": "providers-failed:RateLimitError",
+    "ok": true
+  },
+  "db": {
+    "path": "data/app.db",
+    "ok": true
+  }
+}

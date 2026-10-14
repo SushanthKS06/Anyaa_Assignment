@@ -1,0 +1,11 @@
+name: mishearing_correction
+kind: convo
+conversation:
+  - "Namaste"
+  - "Ghar me 3 log hain — Dadi Jain hain, Papa diabetic hain, aur Beta teen hai jo weekend pe nonveg khata hai"
+  - "7 din ka plan banao, budget 6000 ka hai"
+  - "haan nahi wait, budget 5000 hai"
+  - "aur"
+  - "grocery list banao"
+checks: [recovery, zero_hard_violations, ingredients_covered, cart_total, budget_reported, confirm_gated]
+params: {recovery: {expect_budget: 5000, expect_plan_intact: true}}

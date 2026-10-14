@@ -1,0 +1,18 @@
+name: stocked_pantry
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Dadi, age_group: senior, diet: jain}
+    - {name: Papa, age_group: adult, diet: veg}
+  budget_inr: 4000
+  pantry:
+    atta: {qty: 5, unit: kg}
+    rice: {qty: 5, unit: kg}
+    toor_dal: {qty: 1, unit: kg}
+    salt: {qty: 1, unit: kg}
+    oil: {qty: 1, unit: l}
+  nonveg_days: []
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported]

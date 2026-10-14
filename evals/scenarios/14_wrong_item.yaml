@@ -1,0 +1,13 @@
+name: wrong_item_delivered
+kind: convo
+conversation:
+  - "Namaste"
+  - "Ghar me 2 log hain — Mummy veg hain, Beta nonveg hai"
+  - "5 din ka plan banao, budget 4000 ka hai"
+  - "aur"
+  - "grocery list banao"
+  - "haan, order karo"
+  - "/cook"
+  - "paneer nahi aaya, galat item aa gaya hai"
+checks: [recovery, zero_hard_violations, plan_adapted]
+params: {recovery: {expect_plan_intact: true}}

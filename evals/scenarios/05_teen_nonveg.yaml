@@ -1,0 +1,13 @@
+name: teen_nonveg_weekends
+kind: engine
+seed: 7
+grocery_seed: 7
+household:
+  members:
+    - {name: Mummy, age_group: adult, diet: veg}
+    - {name: Beta, age_group: teen, diet: nonveg}
+  budget_inr: 4500
+  nonveg_days: [Sat, Sun]
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, weekend_side]
+params: {weekend_side: {member: Beta, days: [Sat, Sun]}}

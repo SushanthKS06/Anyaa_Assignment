@@ -1,0 +1,13 @@
+name: diabetic_father
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Papa, age_group: adult, diet: veg, health_notes: [low_sugar]}
+    - {name: Mummy, age_group: adult, diet: veg}
+  budget_inr: 4000
+  nonveg_days: []
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, soft_cover]
+params: {soft_cover: {need: low_sugar, tag: diabetic_ok, min_frac: 0.3}}

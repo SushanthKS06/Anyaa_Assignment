@@ -1,0 +1,601 @@
+{
+ "ts": 1791953432.4203656,
+ "scenarios": [
+  {
+   "name": "joint_jain_grandmother",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "39 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3577 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3577 vs budget Rs.6000 (within)"
+    },
+    "weekend_side": {
+     "pass": true,
+     "detail": "4 weekend sides for Beta"
+    },
+    "soft_cover": {
+     "pass": true,
+     "detail": "diabetic_ok in 67% of meals (need 30%)"
+    }
+   },
+   "judge": {},
+   "secs": 0.08
+  },
+  {
+   "name": "diabetic_father",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "40 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3180 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3180 vs budget Rs.4000 (within)"
+    },
+    "soft_cover": {
+     "pass": true,
+     "detail": "diabetic_ok in 100% of meals (need 30%)"
+    }
+   },
+   "judge": {},
+   "secs": 0.04
+  },
+  {
+   "name": "toddler_soft_food",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "34 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.2640 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.2640 vs budget Rs.4000 (within)"
+    },
+    "soft_cover": {
+     "pass": true,
+     "detail": "kid_ok in 90% of meals (need 30%)"
+    }
+   },
+   "judge": {},
+   "secs": 0.04
+  },
+  {
+   "name": "peanut_allergy",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "37 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.2980 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.2980 vs budget Rs.3500 (within)"
+    },
+    "allergy_separate": {
+     "pass": true,
+     "detail": "allergy members always separate"
+    }
+   },
+   "judge": {},
+   "secs": 0.06
+  },
+  {
+   "name": "teen_nonveg_weekends",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "44 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3437 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3437 vs budget Rs.4500 (within)"
+    },
+    "weekend_side": {
+     "pass": true,
+     "detail": "4 weekend sides for Beta"
+    }
+   },
+   "judge": {},
+   "secs": 0.03
+  },
+  {
+   "name": "navratri_week",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "43 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3890 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3890 vs budget Rs.8000 (within)"
+    },
+    "fasting_plates": {
+     "pass": true,
+     "detail": "vrat plates ok ['Mon']"
+    }
+   },
+   "judge": {},
+   "secs": 0.07
+  },
+  {
+   "name": "surprise_guests",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "41 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3445 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3445 vs budget Rs.5000 (within)"
+    }
+   },
+   "judge": {},
+   "secs": 0.07
+  },
+  {
+   "name": "tight_budget",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "37 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.2980 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.2980 vs budget Rs.2500 (OVER)"
+    },
+    "allergy_separate": {
+     "pass": true,
+     "detail": "allergy members always separate"
+    }
+   },
+   "judge": {},
+   "secs": 0.06
+  },
+  {
+   "name": "cook_on_leave",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "37 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.2620 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.2620 vs budget Rs.4000 (within)"
+    }
+   },
+   "judge": {},
+   "secs": 0.05
+  },
+  {
+   "name": "conflicting_preferences",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "40 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3282 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3282 vs budget Rs.4500 (within)"
+    },
+    "swap_applied": {
+     "pass": true,
+     "detail": "Fri dinner = matar_paneer"
+    },
+    "weekend_side": {
+     "pass": true,
+     "detail": "4 weekend sides for Beta"
+    }
+   },
+   "judge": {},
+   "secs": 0.05
+  },
+  {
+   "name": "near_empty_pantry",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "42 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3337 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3337 vs budget Rs.4000 (within)"
+    }
+   },
+   "judge": {},
+   "secs": 0.04
+  },
+  {
+   "name": "stocked_pantry",
+   "kind": "engine",
+   "checks": {
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "no_conflicts": {
+     "pass": true,
+     "detail": "no CONFLICTs"
+    },
+    "qty_scaling": {
+     "pass": true,
+     "detail": "servings cover headcount incl. guests"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "33 lines cover all"
+    },
+    "no_repeats": {
+     "pass": true,
+     "detail": "repeat window clean"
+    },
+    "prep_feasible": {
+     "pass": true,
+     "detail": "prep tasks + leave-day effort ok"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.2100 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.2100 vs budget Rs.4000 (within)"
+    }
+   },
+   "judge": {},
+   "secs": 0.04
+  },
+  {
+   "name": "mishearing_correction",
+   "kind": "convo",
+   "checks": {
+    "recovery": {
+     "pass": true,
+     "detail": "recovery acknowledged"
+    },
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "ingredients_covered": {
+     "pass": true,
+     "detail": "42 lines cover all"
+    },
+    "cart_total": {
+     "pass": true,
+     "detail": "total Rs.3657 == sum lines"
+    },
+    "budget_reported": {
+     "pass": true,
+     "detail": "total Rs.3657 vs budget Rs.5000 (within)"
+    },
+    "confirm_gated": {
+     "pass": true,
+     "detail": "unconfirmed order refused"
+    }
+   },
+   "judge": {
+    "conciseness": 5.0,
+    "one_question": 5.0,
+    "no_ai_speak": 5.0,
+    "recovery": 5.0,
+    "overall": 5.0,
+    "n": 6
+   },
+   "replies": [
+    "Theek — budget Rs.5000 Grocery total isi hisab se banegi.",
+    "Wed — breakfast: Moong Dal Chilla; lunch: Dal Tadka (Jain-style); dinner: Moong Dal Khichdi | Thu — breakfast: Besan Chilla; lunch: Masoor Dal with Lemon; dinner: Mushroom Masala (Dadi ke liye alag) Aur? (aur bolo)",
+    "List ready — 39 items, total Rs.3657. Budget Rs.5000. 3 cheez out of stock hai (bhindi, capsicum, french_beans). Substitute: jowar_atta. Order karu ya WhatsApp pe bheju?"
+   ],
+   "secs": 0.14
+  },
+  {
+   "name": "wrong_item_delivered",
+   "kind": "convo",
+   "checks": {
+    "recovery": {
+     "pass": true,
+     "detail": "recovery acknowledged"
+    },
+    "zero_hard_violations": {
+     "pass": true,
+     "detail": "0 silent violations"
+    },
+    "plan_adapted": {
+     "pass": true,
+     "detail": "shortfall queued or swap ok"
+    }
+   },
+   "judge": {
+    "conciseness": 5.0,
+    "one_question": 5.0,
+    "no_ai_speak": 5.0,
+    "recovery": 5.0,
+    "overall": 5.0,
+    "n": 8
+   },
+   "replies": [
+    "Order ho gaya! ID SM-ORD-0042-2824, 46 min me aayega (simulated). Kal se cook ko plan de dungi.",
+    "Cook mode. Bolo — aaj kya banana hai?",
+    "Theek. dinner me Matar Paneer ki jagah Aloo Gobhi (35 min). Theek? paneer agli list me likh diya."
+   ],
+   "secs": 0.07
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+name: surprise_guests
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Kaka, age_group: adult, diet: veg}
+    - {name: Kaki, age_group: adult, diet: veg}
+    - {name: Diku, age_group: teen, diet: veg}
+  budget_inr: 5000
+  nonveg_days: []
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+disruptions:
+  - {tool: report_disruption, args: {kind: extra_guests, detail: '6 guests', day: Wednesday, slot: dinner}}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported]

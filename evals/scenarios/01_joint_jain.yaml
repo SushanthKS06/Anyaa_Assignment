@@ -1,0 +1,16 @@
+name: joint_jain_grandmother
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Dadi, age_group: senior, diet: jain, fasting_days: [Thu]}
+    - {name: Papa, age_group: adult, diet: veg, health_notes: [low_sugar]}
+    - {name: Mummy, age_group: adult, diet: veg}
+    - {name: Beta, age_group: teen, diet: nonveg}
+    - {name: Chhotu, age_group: toddler, diet: veg, health_notes: [soft_food]}
+  budget_inr: 6000
+  nonveg_days: [Sat, Sun]
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker, mixer], leave_days: [Thu]}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, weekend_side, soft_cover]
+params: {weekend_side: {member: Beta, days: [Sat, Sun]}, soft_cover: {need: low_sugar, tag: diabetic_ok, min_frac: 0.3}}

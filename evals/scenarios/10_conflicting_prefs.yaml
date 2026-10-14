@@ -1,0 +1,14 @@
+name: conflicting_preferences
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Mummy, age_group: adult, diet: veg, dislikes: [baingan]}
+    - {name: Beta, age_group: teen, diet: nonveg}
+  budget_inr: 4500
+  nonveg_days: [Sat, Sun]
+  cook: {language: Hinglish, skill: medium, equipment: [pressure_cooker], leave_days: []}
+swap: {day: Friday, slot: dinner, new_dish: matar paneer}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, swap_applied, weekend_side]
+params: {swap_applied: {weekday: Fri, slot: dinner, recipe_id: matar_paneer}, weekend_side: {member: Beta, days: [Sat, Sun]}}

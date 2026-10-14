@@ -1,0 +1,13 @@
+name: tight_budget
+kind: engine
+seed: 42
+grocery_seed: 42
+household:
+  members:
+    - {name: Baba, age_group: adult, diet: nonveg}
+    - {name: Ma, age_group: adult, diet: veg}
+    - {name: Chinki, age_group: child, diet: veg, allergies: [peanut]}
+  budget_inr: 2500
+  nonveg_days: [Sun]
+  cook: {language: Bengali+Hinglish, skill: basic, equipment: [pressure_cooker], leave_days: []}
+checks: [zero_hard_violations, no_conflicts, qty_scaling, ingredients_covered, no_repeats, prep_feasible, cart_total, budget_reported, allergy_separate]

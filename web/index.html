@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rasoi — Household Meal Agent Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .scroll { max-height: 38vh; overflow-y: auto; scrollbar-width: thin; }
+    .badge { padding: 2px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .badge-sim { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-live { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .pulse-ring { animation: pulseRing 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-900 min-h-screen p-3 md:p-6">
+<div class="max-w-7xl mx-auto space-y-3">
+
+  <!-- Warning banner if opened via file:// instead of localhost -->
+  <div id="file-warning" class="hidden bg-amber-500 text-stone-950 font-medium px-4 py-3 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">⚠️</span>
+      <span>You opened this via <code>file://</code>. Browsers block microphone and WebSocket connections on local files!</span>
+    </div>
+    <a href="http://localhost:8000" target="_blank" class="px-3 py-1 bg-stone-900 text-white rounded-lg text-sm font-semibold hover:bg-stone-800 transition text-center">
+      Open http://localhost:8000 →
+    </a>
+  </div>
+
+  <!-- Top bar -->
+  <header class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">🥘</div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight">Rasoi — Household Meal Agent</h1>
+        <p class="text-xs text-stone-500">Autonomous Indian kitchen planner & daily cook companion</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 text-xs">
+      <span id="b-instamart" class="badge badge-sim">SIMULATED: Instamart</span>
+      <span id="b-whatsapp" class="badge badge-sim">SIMULATED: WhatsApp</span>
+      <span id="b-sarvam" class="badge badge-sim">Checking Sarvam…</span>
+      <span id="wsstat" class="badge bg-stone-100 text-stone-600 border border-stone-200">
+        <span class="w-2 h-2 rounded-full bg-stone-400 inline-block mr-1"></span>connecting…
+      </span>
+      <span id="model" class="mono text-xs px-2 py-0.5 bg-stone-100 rounded text-stone-700"></span>
+      <span id="lat" class="mono text-xs text-stone-500"></span>
+    </div>
+  </header>
+
+  <!-- Main grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+    
+    <!-- Left Column: Voice + Chat Controls (2 cols on large) -->
+    <div class="lg:col-span-2 flex flex-col gap-3">
+      
+      <!-- Voice & Session Control Bar -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2.5 shadow-sm">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="mic" class="px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-sm flex items-center gap-2 transition shadow-sm active:scale-95 cursor-pointer">
+            <span id="mic-icon">🎤</span>
+            <span id="mic-text">Hold / Click to talk</span>
+          </button>
+          <span id="rec-status" class="text-xs text-stone-500 italic hidden">Listening…</span>
+          <div class="flex items-center gap-1.5 bg-stone-100 px-2.5 py-1.5 rounded-xl border border-stone-200">
+            <span class="text-xs">🌐</span>
+            <select id="lang" class="bg-transparent text-xs font-bold text-stone-700 outline-none cursor-pointer">
+              <option value="auto" selected>✨ Auto-detect (Tamil / English / Hindi)</option>
+              <option value="ta-IN">தமிழ் / Tamil (ta-IN)</option>
+              <option value="en-IN">English (en-IN)</option>
+              <option value="hi-IN">Hindi / Hinglish (hi-IN)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-stone-700">
+            <input type="checkbox" id="vad" class="rounded text-emerald-600 focus:ring-emerald-500">
+            <span>VAD barge-in</span>
+            <span id="vadstat" class="text-stone-400 font-normal">(off)</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-stone-700">
+            <input type="checkbox" id="voice" checked class="rounded text-emerald-600 focus:ring-emerald-500">
+            <span>Voice replies</span>
+          </label>
+          <button id="mode" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-stone-700 border border-stone-200 transition">
+            mode: household
+          </button>
+          <button id="new" class="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-semibold text-stone-700 border border-stone-200 transition">
+            new session
+          </button>
+        </div>
+      </div>
+
+      <!-- Transcript Box -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col shadow-sm">
+        <div class="flex items-center justify-between mb-2 pb-2 border-b border-stone-100">
+          <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Conversation Transcript</span>
+          <span class="text-xs text-stone-400">Hinglish / English</span>
+        </div>
+        <div id="trans" class="scroll text-sm space-y-2.5 min-h-[220px]">
+          <div class="text-xs text-stone-400 italic">Say "Namaste" or press 🎤 to begin planning meals…</div>
+        </div>
+      </div>
+
+      <!-- Text Input Fallback -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-2 flex gap-2 shadow-sm">
+        <input id="tin" class="flex-1 border-0 focus:ring-0 px-3 py-2 text-sm text-stone-800 placeholder-stone-400 outline-none" placeholder="Type here in Hinglish (e.g. 'Dadi Jain hain, 5 din ka plan banao')…">
+        <button id="send" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition shadow-sm cursor-pointer">
+          Send
+        </button>
+      </div>
+
+      <!-- Tool Execution Stream -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Deterministic Engine & Tool Calls</div>
+        <div id="tools" class="mono text-xs scroll space-y-1 text-stone-700 bg-stone-50 p-2.5 rounded-xl border border-stone-100 min-h-[80px]">
+          <div class="text-stone-400">No tool calls yet.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Live Household State, Plan, Cart & WhatsApp -->
+    <div class="flex flex-col gap-3">
+      
+      <!-- Live State Card -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Live State</span>
+          <span id="stage" class="mono text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded font-semibold border border-emerald-200">[intake | household]</span>
+        </div>
+        <div id="state" class="text-sm text-stone-700 space-y-1">
+          <div>members: —</div>
+          <div>budget: — · days: 7</div>
+        </div>
+      </div>
+
+      <!-- Meal Plan Card -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Meal Plan</div>
+        <div id="plan" class="scroll text-xs text-stone-700 space-y-1.5 min-h-[90px]">
+          <div class="text-stone-400">Plan not yet generated.</div>
+        </div>
+      </div>
+
+      <!-- Grocery Cart Card -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Instamart Cart</span>
+          <span class="badge badge-sim">SIMULATED</span>
+        </div>
+        <div id="cart" class="scroll text-xs text-stone-700 space-y-1">
+          <div class="text-stone-400">Cart is empty.</div>
+        </div>
+      </div>
+
+      <!-- WhatsApp Cook Handoff -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-stone-500">WhatsApp Cook Handoff</span>
+          <span class="badge badge-sim">SIMULATED</span>
+        </div>
+        <pre id="wa" class="whitespace-pre-wrap font-sans text-xs text-stone-700 bg-stone-50 p-2.5 rounded-xl border border-stone-100 scroll min-h-[70px]">No handoff message generated yet.</pre>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// Check if loaded from file:// protocol
+if (location.protocol === 'file:') {
+  $('file-warning').classList.remove('hidden');
+}
+
+// WebSocket connection (works both on http://localhost:8000 and even if opened from file://)
+const host = location.host || 'localhost:8000';
+const wsProto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+let ws = null;
+
+function connectWS() {
+  $('wsstat').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>connecting…';
+  try {
+    ws = new WebSocket(wsProto + host + '/ws');
+  } catch (err) {
+    console.warn('WS init error:', err);
+    $('wsstat').innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1"></span>disconnected';
+    return;
+  }
+
+  ws.onopen = () => {
+    $('wsstat').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span>connected';
+    $('wsstat').className = 'badge badge-live';
+  };
+
+  ws.onclose = () => {
+    $('wsstat').innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400 inline-block mr-1"></span>disconnected';
+    $('wsstat').className = 'badge bg-stone-100 text-stone-600 border border-stone-200';
+    // Reconnect after 2 seconds
+    setTimeout(connectWS, 2000);
+  };
+
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    
+    if (m.type === 'ready' || m.type === 'state') {
+      if (m.state) renderState(m.state);
+      if (m.model) $('model').textContent = 'model: ' + m.model;
+      if (m.has_sarvam != null) updateSarvamBadge(m.has_sarvam);
+    }
+    
+    if (m.type === 'assistant') {
+      const lcode = m.lang || lastDetectedLang || 'hi-IN';
+      lastDetectedLang = lcode;
+      const langBadge = lcode === 'ta-IN' ? 'தமிழ்' : (lcode === 'en-IN' ? 'EN' : 'HI');
+      const recipeData = formatRecipeContent(m.text);
+      if (recipeData && (recipeData.ingredients.length > 0 || recipeData.steps.length > 0)) {
+        let intro = '';
+        const mIntro = m.text.match(/^(.*?)(?:(?:\*\*)?(?:Recipe Overview|🍲|Items Used|தேவையான பொருட்கள்|सामग्री))/is);
+        if (mIntro && mIntro[1].trim().length > 5) {
+          intro = mIntro[1].replace(/\*\*/g, '').trim();
+        }
+        $('trans').innerHTML += `
+          <div class="my-2.5 rounded-2xl bg-white border border-stone-200/90 shadow-sm p-4 space-y-3 recipe-card-container">
+            <div class="flex items-center justify-between pb-2 border-b border-stone-100">
+              <div class="flex items-center gap-2">
+                <span class="badge bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border border-emerald-200/60">${langBadge}</span>
+                <b class="text-stone-900 text-xs font-bold">Rasoi Cook Companion</b>
+                <span class="text-[10px] text-stone-400 font-medium hidden sm:inline">· Interactive Kitchen Cockpit</span>
+              </div>
+              <span class="text-[10px] bg-amber-50 text-amber-800 font-semibold px-2 py-0.5 rounded-full border border-amber-200/80 flex items-center gap-1">👨‍🍳 Cook Mode</span>
+            </div>
+            ${renderRecipeCard(recipeData, intro)}
+          </div>
+        `;
+        setTimeout(() => {
+          const cards = $('trans').querySelectorAll('.recipe-card-container');
+          const lastCard = cards[cards.length - 1];
+          if (lastCard) {
+            lastCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            $('trans').scrollTop = 1e6;
+          }
+        }, 50);
+      } else {
+        $('trans').innerHTML += `<div class="p-3 rounded-2xl bg-stone-100 text-stone-800 border border-stone-200/50 shadow-2xs space-y-1.5"><div class="flex items-center gap-1.5"><span class="badge bg-stone-200 text-stone-700 text-[10px] font-bold">${langBadge}</span><b class="text-stone-900 font-semibold">Rasoi</b></div>${renderMessageContent(m.text)}</div>`;
+        $('trans').scrollTop = 1e6;
+      }
+      if (m.latency_ms != null) $('lat').textContent = `${m.latency_ms}ms`;
+      if (m.model) $('model').textContent = 'model: ' + m.model;
+    }
+    
+    if (m.type === 'transcription') {
+      $('trans').innerHTML += `<div class="text-xs text-stone-400 italic px-2">Transcribed via ${m.engine}: "${m.text}"</div>`;
+      $('trans').scrollTop = 1e6;
+    }
+
+    if (m.type === 'tools') {
+      if (m.calls && m.calls.length) {
+        if ($('tools').innerHTML.includes('No tool calls yet')) $('tools').innerHTML = '';
+        m.calls.forEach(c => {
+          $('tools').innerHTML += `<div>${c.ok ? '✅' : '❌'} ${c.text}</div>`;
+        });
+        $('tools').scrollTop = 1e6;
+      }
+    }
+
+    if (m.type === 'tts') {
+      if (voiceOn) {
+        if (m.audio_b64) {
+          playAudioB64(m.audio_b64);
+        } else if (m.engine === 'browser') {
+          speakBrowser(m.text, m.language_code || lastDetectedLang);
+        }
+      }
+    }
+
+    if (m.type === 'interrupted') {
+      $('trans').innerHTML += `<div class="text-xs text-orange-600 italic px-2">…[interrupted]</div>`;
+    }
+  };
+}
+
+connectWS();
+
+// Update Sarvam status badge
+function updateSarvamBadge(hasSarvam) {
+  if (hasSarvam) {
+    $('b-sarvam').textContent = 'SARVAM: Active (Bulbul v3 / Saaras v3)';
+    $('b-sarvam').className = 'badge badge-live';
+  } else {
+    $('b-sarvam').textContent = 'SIMULATED: Sarvam (no key)';
+    $('b-sarvam').className = 'badge badge-sim';
+  }
+}
+
+// Check /api/info on startup
+fetch((location.protocol === 'file:' ? 'http://localhost:8000' : '') + '/api/info')
+  .then(r => r.json())
+  .then(d => {
+    updateSarvamBadge(d.has_sarvam || d.stt_tts === 'sarvam');
+  })
+  .catch(() => {});
+
+let mode = 'household', voiceOn = true, speaking = false, currentLang = 'auto';
+let lastDetectedLang = 'ta-IN';
+let currentAudio = null;
+
+$('lang').onchange = e => {
+  currentLang = e.target.value;
+  if (currentLang !== 'auto') {
+    lastDetectedLang = currentLang;
+  }
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'language', lang: currentLang }));
+  }
+  if (currentLang === 'ta-IN') {
+    $('tin').placeholder = "தமிழில் தட்டச்சு செய்க (e.g. '5 நாள் உணவு திட்டம் குடுங்க')…";
+  } else if (currentLang === 'en-IN') {
+    $('tin').placeholder = "Type here in English (e.g. 'Dadi is Jain, make a 5-day meal plan')…";
+  } else if (currentLang === 'hi-IN') {
+    $('tin').placeholder = "Type here in Hindi (e.g. 'Dadi Jain hain, 5 din ka plan banao')…";
+  } else {
+    $('tin').placeholder = "Speak or type in Tamil, English, or Hindi (Auto-detecting)…";
+  }
+};
+
+function formatRecipeContent(rawText) {
+  if (!rawText) return null;
+  const isRecipe = /(?:Items Used|தேவையான பொருட்கள்|सामग्री|Step-by-Step|செய்முறை|Cooking Process|Cooking Time|Prep Time|தயாரிப்பு நேரம்|பொருட்கள்|Step\s*\d+|படி\s*\d+|स्टेप\s*\d+|कदम\s*\d+|चरण\s*\d+)/i.test(rawText);
+  if (!isRecipe) return null;
+
+  // 1. Dish name
+  let dishName = '';
+  const mPot = rawText.match(/🍲\s*([^—\n\r|*]+)/);
+  if (mPot) {
+    dishName = mPot[1].trim();
+  } else {
+    const mDish = rawText.match(/(?:Dish[:\*]+)\s*([^*\n\r|]+)/i);
+    if (mDish) {
+      dishName = mDish[1].trim();
+    } else {
+      const mIntro = rawText.match(/(?:making|preparing|recipe for|details for making|details for preparing|சமையல்)\s+([^*\n\r,.]+?)(?:\s+for\s+\d+|\s*$)/i);
+      if (mIntro) dishName = mIntro[1].trim();
+    }
+  }
+
+  // 2. Servings & Times
+  const mServ = rawText.match(/(\d+)\s*(?:portions|servings|நபர்கள்|நபர்களுக்கான|लोगों|portions\))/i);
+  const servings = mServ ? mServ[1] : '4';
+
+  const mPrep = rawText.match(/(?:Prep\s*Time|தயாரிப்பு\s*நேரம்|तैयारी\s*समय)[:\*]*\s*(\d+\s*(?:minutes?|mins?|நிமிடங்கள்|मिनट))/i);
+  const prepTime = mPrep ? mPrep[1] : '';
+
+  const mCook = rawText.match(/(?:Cooking\s*Time|சமையல்\s*நேரம்|पकाने\s*का\s*समय)[:\*]*\s*(\d+\s*(?:minutes?|mins?|நிமிடங்கள்|मिनट))/i);
+  const cookTime = mCook ? mCook[1] : '';
+
+  // 3. Section Slicing
+  const ingHeaderIdx = rawText.search(/(?:\*\*)?(?:📦\s*)?(?:Items Used|தேவையான பொருட்கள்|आवश्यक सामग्री|सामग्री)/i);
+  const stepsHeaderIdx = rawText.search(/(?:\*\*)?(?:👨‍🍳\s*)?(?:Step-by-Step|செய்முறை|படிப்படியான|पकाने की विधि|विधि|Cooking Process)/i);
+  const notesHeaderIdx = rawText.search(/(?:\*\*)?(?:💡\s*)?(?:Special Notes|சிறப்பு குறிப்புகள்|विशेष निर्देश|Dietary Adaptations)/i);
+
+  let ingText = '';
+  let stepsText = '';
+  let notesText = '';
+
+  if (ingHeaderIdx !== -1) {
+    const end = stepsHeaderIdx !== -1 ? stepsHeaderIdx : (notesHeaderIdx !== -1 ? notesHeaderIdx : rawText.length);
+    ingText = rawText.slice(ingHeaderIdx, end);
+  }
+
+  if (stepsHeaderIdx !== -1) {
+    const end = notesHeaderIdx !== -1 ? notesHeaderIdx : rawText.length;
+    stepsText = rawText.slice(stepsHeaderIdx, end);
+  }
+
+  if (notesHeaderIdx !== -1) {
+    notesText = rawText.slice(notesHeaderIdx);
+  }
+
+  // Parse Ingredients
+  const ingredients = [];
+  const ingLines = ingText.split(/\r?\n|(?<=[^\d])\s*[•*]+\s*(?=[A-Za-z\u0B80-\u0BFF\u0900-\u097F])/).map(s => s.trim()).filter(Boolean);
+  for (let i = 0; i < ingLines.length; i++) {
+    const line = ingLines[i];
+    if (/(?:Items Used|தேவையான பொருட்கள்|सामग्री|Exact Quantities|Quantity)/i.test(line)) continue;
+    const colonIdx = line.indexOf(':');
+    if (colonIdx > 0 && colonIdx < line.length - 1) {
+      const item = line.slice(0, colonIdx).replace(/\*\*/g, '').replace(/^[•*\s]+/, '').trim();
+      const qty = line.slice(colonIdx + 1).replace(/\*\*/g, '').replace(/[•*\s]+$/, '').trim();
+      if (item && qty && !/(?:Dish|Servings|Prep Time|Cooking Time)/i.test(item)) {
+        ingredients.push({ item, qty });
+      }
+    } else if (colonIdx === line.length - 1 && i + 1 < ingLines.length) {
+      const item = line.slice(0, colonIdx).replace(/\*\*/g, '').replace(/^[•*\s]+/, '').trim();
+      const qty = ingLines[i + 1].replace(/\*\*/g, '').replace(/^[•*\s]+/, '').replace(/[•*\s]+$/, '').trim();
+      if (item && qty && !/(?:Dish|Servings|Prep Time|Cooking Time)/i.test(item)) {
+        ingredients.push({ item, qty });
+        i++;
+      }
+    }
+  }
+
+  // Parse Steps
+  const steps = [];
+  const rawStepParts = stepsText.split(/(?=(?:(?:\*\*|(?:^|\n|\*\s*))(?:Step|படி|स्टेप|कदम|चरण)\s*\d+[:\*]*|[0-9]+\.\s+))/i);
+  for (const part of rawStepParts) {
+    let clean = part.replace(/^[*\s•]+/, '').trim();
+    if (!clean) continue;
+    const mLabel = clean.match(/^((?:(?:\*\*)?(?:Step|படி|स्टेप|कदम|चरण)\s*\d+[:\*]*(?:\*\*)?|[0-9]+\.))\s*(.*)/is);
+    if (mLabel) {
+      const label = mLabel[1].replace(/[\*:]/g, '').trim();
+      const body = mLabel[2].replace(/^[:\*]+\s*/, '').replace(/\s*\*\s*$/, '').trim();
+      if (body && !/(?:Step-by-Step|செய்முறை|Cooking Process|படிப்படியான|पकाने की विधि)/i.test(body)) {
+        steps.push({ label, body });
+      }
+    } else if (clean.length > 15 && !/(?:Step-by-Step|செய்முறை|Cooking Process|पकाने की विधि)/i.test(clean)) {
+      steps.push({ label: `Step ${steps.length + 1}`, body: clean.replace(/\s*\*\s*$/, '').trim() });
+    }
+  }
+
+  // Parse Notes
+  const notes = [];
+  if (notesText) {
+    const rawLines = notesText.split(/[\r\n]+|[•*]+\s*(?=[A-Za-z\u0B80-\u0BFF\u0900-\u097F])/).map(s => s.trim()).filter(Boolean);
+    for (const line of rawLines) {
+      if (/(?:Special Notes|சிறப்பு குறிப்புகள்|Dietary Adaptations|विशेष निर्देश|Adaptations)/i.test(line) && line.length < 60) continue;
+      const cleanNote = line.replace(/\*\*/g, '').replace(/^[💡•*\s]+/, '').replace(/\s*\*\s*$/, '').trim();
+      if (cleanNote.length > 3) {
+        notes.push(cleanNote);
+      }
+    }
+  }
+
+  return {
+    dishName: dishName || 'Recipe Instructions',
+    servings,
+    prepTime,
+    cookTime,
+    ingredients,
+    steps,
+    notes
+  };
+}
+
+function renderRecipeCard(data, introText) {
+  const isNonVeg = /chicken|macher|fish|egg|mutton|nonveg|மட்டன்|சிக்கன்|முட்டை|மீன்/i.test(data.dishName);
+  const dietBadge = isNonVeg 
+    ? `<span class="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 text-[11px] font-bold border border-rose-200 shadow-2xs flex items-center gap-1">🍗 Non-Veg</span>`
+    : `<span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200 shadow-2xs flex items-center gap-1">🌱 Vegetarian</span>`;
+
+  return `
+    ${introText ? `<div class="text-xs text-stone-600 mb-1.5 font-medium leading-relaxed">${introText}</div>` : ''}
+    <div class="rounded-2xl border border-stone-200/90 shadow-sm bg-gradient-to-b from-stone-50/70 via-white to-stone-50/40 overflow-hidden space-y-4">
+      
+      <!-- Top Culinary Accent Strip -->
+      <div class="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-amber-400 to-rose-400"></div>
+
+      <div class="px-4 pb-4 space-y-4">
+        <!-- Hero Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-stone-100 pb-3">
+          <div>
+            <div class="text-[10px] uppercase tracking-wider font-extrabold text-emerald-700 flex items-center gap-1.5">
+              <span>👨‍🍳</span> <span>COOK COMPANION · STEP-BY-STEP PREPARATION</span>
+            </div>
+            <h3 class="text-lg font-black text-stone-900 mt-1 flex items-center gap-2 tracking-tight">
+              <span>🍲</span> <span>${data.dishName}</span>
+            </h3>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 text-xs">
+            ${dietBadge}
+            <span class="px-2.5 py-1 rounded-full bg-stone-100 text-stone-800 font-semibold border border-stone-200 shadow-2xs">👥 ${data.servings} portions</span>
+            ${data.prepTime ? `<span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200 shadow-2xs">⏱️ Prep: ${data.prepTime}</span>` : ''}
+            ${data.cookTime ? `<span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-900 font-semibold border border-amber-200 shadow-2xs">🍳 Cook: ${data.cookTime}</span>` : ''}
+          </div>
+        </div>
+
+        <!-- Kitchen Companion Tools Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-stone-100/70 p-2.5 rounded-xl border border-stone-200/70 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-stone-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
+              <span>⚡</span> <span>Kitchen Tools:</span>
+            </span>
+            <button onclick="readRecipeSteps(this)" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-200 font-semibold text-stone-800 shadow-2xs transition flex items-center gap-1.5 active:scale-95">
+              <span>🔊</span> <span>Read Steps</span>
+            </button>
+            <button onclick="startCookingTimer(5, this)" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-200 font-semibold text-stone-800 shadow-2xs transition flex items-center gap-1.5 active:scale-95">
+              <span>⏱️</span> <span>5m Timer</span>
+            </button>
+            <button onclick="startCookingTimer(15, this)" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-50 border border-stone-200 font-semibold text-stone-800 shadow-2xs transition flex items-center gap-1.5 active:scale-95">
+              <span>⏱️</span> <span>15m Timer</span>
+            </button>
+          </div>
+          <div id="active-recipe-timer" class="hidden px-3 py-1 rounded-lg bg-emerald-600 text-white font-mono font-bold text-xs shadow-xs animate-pulse"></div>
+        </div>
+
+        <!-- Ingredients Section (Mise en Place Checklist) -->
+        ${data.ingredients && data.ingredients.length ? `
+          <div class="bg-stone-50/90 rounded-2xl p-3.5 border border-stone-200/80 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📦</span> <span>Items Used & Exact Quantities (${data.ingredients.length} items)</span>
+              </div>
+              <span class="text-[10px] text-stone-400 font-medium">Click to mark gathered</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+              ${data.ingredients.map(ing => `
+                <div onclick="toggleIngredientCard(this)" class="group cursor-pointer select-none flex justify-between items-center bg-white hover:bg-stone-50/90 px-3 py-2 rounded-xl text-xs border border-stone-200/90 shadow-2xs transition-all duration-150">
+                  <div class="flex items-center gap-2 truncate mr-2">
+                    <div class="ing-check w-4 h-4 rounded border border-stone-300 flex items-center justify-center shrink-0 group-hover:border-emerald-500 transition-colors">
+                      <svg class="hidden check-icon w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <span class="ing-name font-semibold text-stone-800 truncate">${ing.item}</span>
+                  </div>
+                  <span class="font-bold text-emerald-800 shrink-0 font-mono bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200/80 text-[11px] shadow-2xs">${ing.qty}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Step-by-Step Cooking Process -->
+        ${data.steps && data.steps.length ? `
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🔥</span> <span>Step-by-Step Cooking Process (${data.steps.length} steps)</span>
+              </div>
+              <span class="text-[10px] text-stone-400 font-medium">Click step to mark completed</span>
+            </div>
+            <div class="space-y-2">
+              ${data.steps.map((st, idx) => `
+                <div onclick="toggleStepCard(this)" class="step-card group cursor-pointer select-none flex gap-3 items-start bg-white hover:bg-stone-50/90 p-3.5 rounded-xl border border-stone-200/90 shadow-2xs transition-all duration-150">
+                  <div class="step-badge px-2.5 py-1 bg-gradient-to-br from-emerald-600 to-emerald-700 text-white rounded-lg text-xs font-black shrink-0 tracking-wide shadow-xs flex items-center gap-1">
+                    <span>${st.label || ('Step ' + (idx + 1))}</span>
+                    <svg class="hidden step-check-icon w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                  </div>
+                  <div class="step-text text-xs text-stone-800 leading-relaxed pt-0.5 font-normal flex-1">
+                    ${st.body}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Special Notes & Dietary Adaptations -->
+        ${data.notes && data.notes.length ? `
+          <div class="bg-gradient-to-r from-amber-50/90 to-orange-50/70 border border-amber-200/90 rounded-2xl p-3.5 text-xs text-amber-950 space-y-2 shadow-2xs">
+            <div class="font-extrabold text-amber-950 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <span>💡</span> <span>Special Notes & Dietary Adaptations</span>
+            </div>
+            <div class="space-y-1.5">
+              ${data.notes.map(n => {
+                const isChild = /(?:Child|Toddler|குழந்தை|बच्चा)/i.test(n);
+                const isVeg = /(?:Veg|Vegetarian|சைவம்|शाकाहारी)/i.test(n);
+                if (isChild) {
+                  return `
+                    <div class="flex items-start gap-2 bg-white/90 p-2 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <span class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 font-bold text-[10px] shrink-0 flex items-center gap-1">👶 Toddler / Child</span>
+                      <span class="text-stone-800 leading-normal font-medium">${n.replace(/^(?:Child|Toddler|குழந்தை|बच्चा)[:\*]*\s*/i, '')}</span>
+                    </div>
+                  `;
+                }
+                if (isVeg) {
+                  return `
+                    <div class="flex items-start gap-2 bg-white/90 p-2 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[10px] shrink-0 flex items-center gap-1">🥦 Veg Swap</span>
+                      <span class="text-stone-800 leading-normal font-medium">${n.replace(/^(?:Veg|Vegetarian|சைவம்|शाकाहारी)[:\*]*\s*/i, '')}</span>
+                    </div>
+                  `;
+                }
+                return `
+                  <div class="flex items-start gap-2 bg-white/90 p-2 rounded-xl border border-amber-200/60 shadow-2xs">
+                    <span class="text-amber-600 font-bold">•</span>
+                    <span class="text-stone-800 leading-normal font-medium">${n}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+window.toggleIngredientCard = function(el) {
+  el.classList.toggle('bg-emerald-50/70');
+  el.classList.toggle('border-emerald-300');
+  const checkIcon = el.querySelector('.check-icon');
+  const box = el.querySelector('.ing-check');
+  const name = el.querySelector('.ing-name');
+  if (checkIcon) checkIcon.classList.toggle('hidden');
+  if (box) {
+    box.classList.toggle('bg-emerald-600');
+    box.classList.toggle('border-emerald-600');
+  }
+  if (name) name.classList.toggle('line-through');
+};
+
+window.toggleStepCard = function(el) {
+  el.classList.toggle('border-emerald-400');
+  el.classList.toggle('bg-emerald-50/40');
+  const checkIcon = el.querySelector('.step-check-icon');
+  if (checkIcon) checkIcon.classList.toggle('hidden');
+  const text = el.querySelector('.step-text');
+  if (text) text.classList.toggle('text-stone-600');
+};
+
+window.startCookingTimer = function(minutes, btn) {
+  let seconds = minutes * 60;
+  const timerBadge = document.getElementById('active-recipe-timer');
+  if (!timerBadge) return;
+  timerBadge.classList.remove('hidden', 'bg-rose-600', 'animate-bounce');
+  timerBadge.classList.add('bg-emerald-600', 'animate-pulse');
+  if (window._cookTimerInterval) clearInterval(window._cookTimerInterval);
+  const updateTimer = () => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerBadge.textContent = `⏱️ ${m}:${s < 10 ? '0' : ''}${s}`;
+    if (seconds <= 0) {
+      clearInterval(window._cookTimerInterval);
+      timerBadge.textContent = `🔔 Timer Done (${minutes}m)!`;
+      timerBadge.classList.remove('bg-emerald-600', 'animate-pulse');
+      timerBadge.classList.add('bg-rose-600', 'animate-bounce');
+    }
+    seconds--;
+  };
+  updateTimer();
+  window._cookTimerInterval = setInterval(updateTimer, 1000);
+};
+
+window.readRecipeSteps = function(btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('Speech synthesis not supported in this browser.');
+    return;
+  }
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    btn.innerHTML = '<span>🔊</span> <span>Read Steps</span>';
+    return;
+  }
+  const stepTexts = Array.from(document.querySelectorAll('.step-text')).map(el => el.textContent.trim()).filter(Boolean);
+  if (!stepTexts.length) return;
+  const fullText = stepTexts.join('. Next step: ');
+  const utter = new SpeechSynthesisUtterance(fullText);
+  utter.rate = 0.95;
+  utter.onend = () => { btn.innerHTML = '<span>🔊</span> <span>Read Steps</span>'; };
+  btn.innerHTML = '<span>⏹️</span> <span>Stop Reading</span>';
+  window.speechSynthesis.speak(utter);
+};
+
+function renderMessageContent(text) {
+  if (!text) return '';
+  const recipeData = formatRecipeContent(text);
+  if (recipeData && (recipeData.ingredients.length > 0 || recipeData.steps.length > 0)) {
+    let intro = '';
+    const mIntro = text.match(/^(.*?)(?:(?:\*\*)?(?:Recipe Overview|🍲|Items Used|தேவையான பொருட்கள்|सामग्री))/is);
+    if (mIntro && mIntro[1].trim().length > 5) {
+      intro = mIntro[1].replace(/\*\*/g, '').trim();
+    }
+    return renderRecipeCard(recipeData, intro);
+  }
+
+  // Format general markdown
+  let html = text
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/(?:^|\n)[•\*]\s*(.*?)(?=\n[•\*]|\n\n|$)/g, '<div class="flex items-start gap-1.5 my-0.5"><span class="text-emerald-600 font-bold">•</span><span>$1</span></div>')
+    .replace(/\n\n/g, '<div class="my-1.5"></div>')
+    .replace(/\n/g, '<br>');
+
+  return `<div class="leading-relaxed">${html}</div>`;
+}
+
+function formatMealChip(m) {
+  const isNonVegDish = /chicken|macher|fish|egg curry|mutton|nonveg/i.test(m.dish);
+  let hasNonVegSide = false;
+  let nonVegSideName = '';
+  let sepText = '';
+
+  if (m.adaptations && m.adaptations.length) {
+    for (const a of m.adaptations) {
+      const ch = a.change || '';
+      const mNv = ch.match(/(?:nonveg side|separate nonveg dish):\s*([^(\n]+)/i);
+      if (mNv) {
+        hasNonVegSide = true;
+        nonVegSideName = mNv[1].trim();
+      }
+      const mSep = ch.match(/separate dish:\s*([^(\n]+)/i);
+      if (mSep) {
+        sepText = `${a.member}: ${mSep[1].trim()}`;
+      }
+    }
+  }
+
+  let label = `<b>${m.slot}:</b> `;
+  if (isNonVegDish) {
+    label += `🍗 ${m.dish}`;
+    if (sepText) {
+      label += ` <span class="text-[10px] text-stone-600 font-normal">(${sepText})</span>`;
+    }
+  } else if (hasNonVegSide) {
+    label += `${m.dish} <span class="text-amber-800 font-semibold">(+ 🍗 ${nonVegSideName})</span>`;
+  } else {
+    label += m.dish;
+    if (m.adaptations && m.adaptations.length) {
+      label += '*';
+    }
+  }
+
+  const badgeClass = (isNonVegDish || hasNonVegSide)
+    ? 'bg-amber-50 text-amber-950 border border-amber-200 shadow-sm'
+    : 'bg-emerald-50 text-emerald-800';
+
+  const titleAttr = (m.adaptations || []).map(a => `${a.member}: ${a.change}`).join('; ').replace(/"/g, '&quot;');
+
+  return `<span class="${badgeClass} px-2 py-0.5 rounded text-[11px] font-medium mr-1.5 my-0.5 inline-block" title="${titleAttr}">${label}</span>`;
+}
+
+function renderState(s) {
+  $('stage').textContent = `[${s.stage} | ${s.mode}]`;
+  $('state').innerHTML = `
+    <div><b>Members:</b> ${(s.members || []).map(m => `<span class="inline-block bg-stone-100 px-1.5 py-0.5 rounded text-xs mr-1 font-medium">${m.name} (${m.diet}${m.allergies && m.allergies.length ? ', allergy: ' + m.allergies.join('/') : ''})</span>`).join('') || '—'}</div>
+    <div><b>Budget:</b> ${s.budget ? '₹' + s.budget : '—'} &nbsp;·&nbsp; <b>Days:</b> ${s.days || 7}</div>
+  `;
+  
+  if (s.plan && s.plan.length) {
+    $('plan').innerHTML = s.plan.map(d => `
+      <div class="border-b border-stone-100 pb-1">
+        <b class="text-stone-900">${d.weekday}:</b>
+        ${d.meals.map(formatMealChip).join(' ')}
+      </div>
+    `).join('');
+  } else {
+    $('plan').innerHTML = '<div class="text-stone-400">Plan not yet generated.</div>';
+  }
+
+  if (s.cart && s.cart.length) {
+    $('cart').innerHTML = s.cart.map(l => `
+      <div class="flex justify-between items-center py-0.5 border-b border-stone-100">
+        <span>${l.sku} <span class="text-stone-400">×${l.packs}</span>${l.substituted ? ' <span class="text-amber-600 font-semibold">(sub)</span>' : ''}</span>
+        <span class="font-medium">₹${l.line_total}</span>
+      </div>
+    `).join('') + `
+      <div class="flex justify-between items-center font-bold text-stone-900 pt-1.5">
+        <span>Total</span>
+        <span class="text-emerald-700">₹${s.total}</span>
+      </div>
+      ${s.missing && s.missing.length ? `<div class="text-amber-700 text-[11px] pt-1">Missing items: ${s.missing.join(', ')}</div>` : ''}
+    `;
+  } else {
+    $('cart').innerHTML = '<div class="text-stone-400">Cart is empty.</div>';
+  }
+
+  const byCat = {};
+  (s.cart || []).forEach(l => { (byCat[l.category] = byCat[l.category] || []).push(l); });
+  if (Object.keys(byCat).length) {
+    $('wa').textContent = '*Grocery List (Instamart Handoff)*\n' + 
+      Object.keys(byCat).sort().map(c => `*${c}*\n` + byCat[c].map(l => `- ${l.item}: ${l.packs} pack = ₹${l.line_total}`).join('\n')).join('\n') + 
+      `\n\n*Total: ₹${s.total}*`;
+  } else {
+    $('wa').textContent = 'No handoff message generated yet.';
+  }
+}
+
+// Robust Sequential Audio Playback Queue
+const audioQueue = [];
+let isAudioPlaying = false;
+window.activeUtterances = [];
+const browserTtsQueue = [];
+let isBrowserTtsSpeaking = false;
+
+function clearAudioQueue() {
+  audioQueue.length = 0;
+  isAudioPlaying = false;
+  browserTtsQueue.length = 0;
+  isBrowserTtsSpeaking = false;
+  speaking = false;
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (_) {}
+    currentAudio = null;
+  }
+  try {
+    window.activeUtterances = [];
+    speechSynthesis.cancel();
+  } catch (_) {}
+}
+
+// Play Sarvam TTS Base64 Audio via sequential queue
+function playAudioB64(b64) {
+  if (!b64 || !voiceOn) return;
+  audioQueue.push(b64);
+  if (!isAudioPlaying) {
+    playNextAudio();
+  }
+}
+
+function playNextAudio() {
+  if (!voiceOn || audioQueue.length === 0) {
+    isAudioPlaying = false;
+    speaking = false;
+    return;
+  }
+  isAudioPlaying = true;
+  speaking = true;
+  const nextB64 = audioQueue.shift();
+  try {
+    currentAudio = new Audio('data:audio/wav;base64,' + nextB64);
+    currentAudio.onended = () => {
+      currentAudio = null;
+      playNextAudio();
+    };
+    currentAudio.onerror = err => {
+      console.warn('Audio segment error, playing next:', err);
+      currentAudio = null;
+      playNextAudio();
+    };
+    currentAudio.play().catch(e => {
+      console.warn('Audio play error:', e);
+      currentAudio = null;
+      playNextAudio();
+    });
+  } catch (err) {
+    console.error('Audio creation error:', err);
+    currentAudio = null;
+    playNextAudio();
+  }
+}
+
+// Fallback: Browser WebSpeech TTS via sequential queue with GC protection
+function speakBrowser(t, lang) {
+  if (!voiceOn || !t) return;
+  browserTtsQueue.push({ text: t, lang: lang });
+  if (!isBrowserTtsSpeaking) {
+    playNextBrowserTts();
+  }
+}
+
+function playNextBrowserTts() {
+  if (!voiceOn || browserTtsQueue.length === 0) {
+    isBrowserTtsSpeaking = false;
+    speaking = false;
+    return;
+  }
+  isBrowserTtsSpeaking = true;
+  speaking = true;
+  const item = browserTtsQueue.shift();
+  try {
+    const u = new SpeechSynthesisUtterance(item.text);
+    const targetLang = item.lang || (currentLang === 'auto' ? (lastDetectedLang || 'hi-IN') : currentLang);
+    u.lang = targetLang;
+    u.rate = 1.0;
+    
+    // Protect from Chromium Garbage Collection dropping queued utterances
+    window.activeUtterances.push(u);
+    
+    u.onend = () => {
+      window.activeUtterances = window.activeUtterances.filter(x => x !== u);
+      playNextBrowserTts();
+    };
+    u.onerror = () => {
+      window.activeUtterances = window.activeUtterances.filter(x => x !== u);
+      playNextBrowserTts();
+    };
+    speechSynthesis.speak(u);
+  } catch (e) {
+    playNextBrowserTts();
+  }
+}
+
+// Send user message
+function send(text, voice) {
+  if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+  clearAudioQueue();
+  $('trans').innerHTML += `<div class="p-2 rounded-xl bg-emerald-600 text-white ml-auto max-w-[85%] text-right font-medium"><b>You:</b> ${text}</div>`;
+  $('trans').scrollTop = 1e6;
+  ws.send(JSON.stringify({ type: 'user_text', text, voice: voice ?? voiceOn, lang: currentLang }));
+}
+
+$('send').onclick = () => { send($('tin').value); $('tin').value = ''; };
+$('tin').onkeydown = e => { if (e.key === 'Enter') $('send').click(); };
+
+$('mode').onclick = () => {
+  clearAudioQueue();
+  mode = mode === 'household' ? 'cook' : 'household';
+  $('mode').textContent = 'mode: ' + mode;
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'mode', mode }));
+  }
+};
+
+$('new').onclick = () => {
+  clearAudioQueue();
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'new_session' }));
+  }
+  $('trans').innerHTML = '';
+  $('tools').innerHTML = '<div class="text-stone-400">No tool calls yet.</div>';
+};
+
+$('voice').onchange = e => {
+  voiceOn = e.target.checked;
+  if (!voiceOn) {
+    clearAudioQueue();
+  }
+};
+
+// Push-to-talk & Toggle Voice Recording
+// Dual implementation: WebSpeech API with fallback to MediaRecorder + Sarvam STT
+const mic = $('mic');
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let isRecording = false;
+let speechRec = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let silenceTimer = null;
+let accumulatedTranscript = '';
+
+function startListening() {
+  if (isRecording) return;
+  isRecording = true;
+  accumulatedTranscript = '';
+  clearTimeout(silenceTimer);
+  clearAudioQueue();
+
+  mic.classList.remove('bg-red-500', 'hover:bg-red-600');
+  mic.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'pulse-ring');
+  $('mic-icon').textContent = '🔴';
+  $('mic-text').textContent = 'Listening… (Click to Finish & Send)';
+  $('rec-status').classList.remove('hidden');
+  $('rec-status').textContent = 'Listening to your voice…';
+
+  // Try WebSpeech first if on HTTP/HTTPS
+  if (SR && location.protocol !== 'file:') {
+    try {
+      speechRec = new SR();
+      speechRec.lang = (currentLang === 'auto' ? (lastDetectedLang || 'ta-IN') : currentLang);
+      speechRec.interimResults = true;
+      speechRec.continuous = true;
+      
+      speechRec.onresult = e => {
+        let interim = '';
+        accumulatedTranscript = '';
+        for (let i = 0; i < e.results.length; ++i) {
+          if (e.results[i].isFinal) {
+            accumulatedTranscript += e.results[i][0].transcript + ' ';
+          } else {
+            interim += e.results[i][0].transcript;
+          }
+        }
+        const full = (accumulatedTranscript + interim).trim();
+        $('tin').value = full;
+
+        // Reset silence timer on every new word detected (5.0s buffer)
+        clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+          if (isRecording && $('tin').value.trim()) {
+            stopListening();
+          }
+        }, 5000);
+      };
+      
+      speechRec.onerror = err => {
+        console.warn('SpeechRecognition error:', err.error);
+        if (err.error === 'not-allowed') {
+          alert('Microphone permission blocked. Please allow microphone access in your browser address bar.');
+        }
+        if (err.error !== 'no-speech') {
+          stopListening();
+        }
+      };
+      
+      speechRec.onend = () => {
+        if (isRecording) {
+          stopListening();
+        }
+      };
+      
+      speechRec.start();
+      return;
+    } catch (e) {
+      console.warn('WebSpeech init failed, trying MediaRecorder fallback:', e);
+    }
+  }
+
+  // Fallback: MediaRecorder -> Sarvam STT
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const b64 = reader.result;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              $('rec-status').textContent = 'Transcribing with Sarvam…';
+              ws.send(JSON.stringify({ type: 'user_audio', audio_b64: b64, voice: voiceOn, lang: currentLang }));
+            }
+          };
+          reader.readAsDataURL(audioBlob);
+        };
+        mediaRecorder.start();
+      })
+      .catch(err => {
+        console.error('Microphone error:', err);
+        alert('Could not access microphone: ' + err.message + '\n\nPlease ensure you are accessing via http://localhost:8000 (not file://).');
+        stopListening();
+      });
+  } else {
+    alert('Browser does not support audio recording. Please open in Google Chrome at http://localhost:8000');
+    stopListening();
+  }
+}
+
+function stopListening() {
+  if (!isRecording) return;
+  isRecording = false;
+  clearTimeout(silenceTimer);
+  mic.classList.remove('bg-emerald-600', 'hover:bg-emerald-700', 'pulse-ring');
+  mic.classList.add('bg-red-500', 'hover:bg-red-600');
+  $('mic-icon').textContent = '🎤';
+  $('mic-text').textContent = 'Hold / Click to talk';
+  $('rec-status').classList.add('hidden');
+  $('rec-status').textContent = 'Listening…';
+
+  try { if (speechRec) speechRec.stop(); } catch (_) {}
+  try { if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop(); } catch (_) {}
+
+  const textToSend = $('tin').value.trim();
+  if (textToSend) {
+    $('tin').value = '';
+    send(textToSend);
+  }
+}
+
+// Support both click-to-toggle AND hold-to-talk
+let pressTimer = null;
+let holdActive = false;
+
+mic.addEventListener('mousedown', () => {
+  pressTimer = setTimeout(() => {
+    holdActive = true;
+    startListening();
+  }, 250);
+});
+
+mic.addEventListener('mouseup', () => {
+  if (pressTimer) clearTimeout(pressTimer);
+  if (holdActive) {
+    holdActive = false;
+    stopListening();
+  } else {
+    // Click toggle
+    if (isRecording) stopListening();
+    else startListening();
+  }
+});
+
+// Touch support for mobile/tablets
+mic.addEventListener('touchstart', e => {
+  e.preventDefault();
+  startListening();
+});
+mic.addEventListener('touchend', e => {
+  e.preventDefault();
+  stopListening();
+});
+
+// VAD barge-in (Silero via CDN, graceful fallback to PTT-only)
+$('vad').onchange = async e => {
+  if (!e.target.checked) {
+    try { vad && vad.pause(); } catch (_) {}
+    $('vadstat').textContent = '(off)';
+    return;
+  }
+  try {
+    const { MicVAD } = await import('https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.22/dist/bundle.esm.js');
+    vad = await MicVAD.new({
+      onSpeechStart: () => {
+        if (speaking) {
+          if (currentAudio) currentAudio.pause();
+          speechSynthesis.cancel();
+          speaking = false;
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'interrupt', spoken_chars: 40 }));
+          }
+        }
+      }
+    });
+    vad.start();
+    $('vadstat').textContent = '(Silero on — speak to barge in)';
+  } catch (err) {
+    $('vadstat').textContent = '(unavailable — PTT only)';
+    e.target.checked = false;
+  }
+};
+</script>
+</body>
+</html>
